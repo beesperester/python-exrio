@@ -8,7 +8,7 @@ import os
 import re
 import time
 
-from multiprocessing import Pool, TimeoutError
+from multiprocessing import Pool
 
 # exr
 import OpenEXR
@@ -29,40 +29,21 @@ class LayerMapEmptyException(Exception):
 
 # methods
 
-def rename_layer_name(layer_name, replacement_name, replacement_format='{layer_name}.{channel_name}'):
-    """ Rename layer with replacement.
-
-    Args:
-        layer_name (str): Layer name
-        replacement_name (str): Replacement name
-        replacement_format (str): Replacement format
-
-    Returns:
-        str
-    """
-    split_channel = layer_name.split('.')
-                
-    # create renamed layer name
-    if len(split_channel) > 1:
-        renamed_layer_name = replacement_format.format(layer_name=replacement_name, channel_name=split_channel[-1])
-    else:
-        renamed_layer_name = replacement_name
-
-    return renamed_layer_name
-
-def rename_channels(in_path, out_path, layer_map=None, rename_method=None):
+def rename_file(in_path, out_path, layer_map=None):
     """ Rename layers of exr file at in_path by replacing layer names via regular expression provided by layer_map and storing a new exr file at out_path.
 
     Args:
         in_path (str): File to read
         out_path (str): File to write
         layer_map (dict): Regular expression / replacement name pairs
-        rename_method (method): Method for creating the new layer name
 
     Raises:
         NoExrFileException
     """
     logging.info('Start rename of {out_path}.'.format(out_path=out_path))
+
+    if in_path == out_path:
+        raise SameFileException(out_path)
 
     # start time
     time_start = time.time()
@@ -90,19 +71,23 @@ def rename_channels(in_path, out_path, layer_map=None, rename_method=None):
 
     for layer_name, value in in_exr_header['channels'].iteritems():
         for pattern, replacement_name in layer_map.iteritems():
-            if re.search(pattern, layer_name, flags=re.IGNORECASE):
-                if not hasattr(rename_method, '__call__'):
-                    rename_method = rename_layer_name
-                    
-                renamed_layer_name = rename_method(layer_name, replacement_name)
+            matches = re.search(r'{}'.format(pattern), layer_name, flags=re.IGNORECASE)
+
+            if matches:
+                match_data = matches.groupdict()
+
+                if 'channel' in match_data.keys():
+                    out_channel_name = replacement_name + '.' + match_data['channel']
+                else:
+                    out_channel_name = replacement_name
 
                 # insert renamed channel into header with old channel value
                 out_exr_header['channels'].update({
-                    renamed_layer_name: value
+                    out_channel_name: value
                 })
 
                 # store renamed layer with data
-                matched_layers[renamed_layer_name] = in_exr_file.channel(layer_name)
+                matched_layers[out_channel_name] = in_exr_file.channel(layer_name)
 
     out_exr_file = OpenEXR.OutputFile(out_path, out_exr_header)
 
@@ -121,16 +106,17 @@ def rename_channels(in_path, out_path, layer_map=None, rename_method=None):
     logging.info('Renamed {num_channels} channels of {out_path} ({duration}s).'.format(num_channels=len(matched_layers.keys()), out_path=out_path, duration=duration))
 
 def rename_worker(args):
-    rename_channels(*args)
+    rename_file(*args)
 
-def rename_files(files, out_fs, layer_map=None, rename_method=None, num_threads=None, multithreading=True):
+def rename_files(files, out_fs, layer_map=None, num_threads=None, multithreading=True):
     """ Rename layers in list of exr files and store at out_fs.
 
     Args:
         files (list): List of exr files
         out_fs (fs): Output filesystem
         layer_map (dict): regular expression / replacement name pairs
-        rename_method (method): Method for creating the new layer name
+        num_threads (int): Number of threads to use
+        multithreading (bool): Use multithreading
 
     Raises:
         SameFileException
@@ -148,15 +134,7 @@ def rename_files(files, out_fs, layer_map=None, rename_method=None, num_threads=
         # get out_path
         out_path = out_fs.getsyspath(unicode(basename))
 
-        # check if file_path and out_path are not identical (Don't override input)
-        if file_path == out_path:
-            raise SameFileException(out_path)
-
-        # rename_channels(file_path, out_path, layer_map, rename_method)
-
-        # queue.put((file_path, out_path, layer_map, rename_method))
-
-        tasks.append((file_path, out_path, layer_map, rename_method))
+        tasks.append((file_path, out_path, layer_map))
 
     if multithreading:
         # run tasks in parallel
@@ -170,14 +148,15 @@ def rename_files(files, out_fs, layer_map=None, rename_method=None, num_threads=
 
     logging.info('Finished renaming of {} files.'.format(len(files)))
 
-def rename_dir(in_fs, out_fs, layer_map=None, rename_method=None, num_threads=8):
+def rename_dir(in_fs, out_fs, layer_map=None, num_threads=None, multithreading=True):
     """ Rename exr files in in_fs.
 
     Args:
         in_fs (fs): Input filesystem
         out_fs (fs): Output filesystem
         layer_map (dict): regular expression / replacement name pairs
-        rename_method (method): Method for creating the new layer name
+        num_threads (int): Number of threads to use
+        multithreading (bool): Use multithreading
     """
 
     files = []
@@ -185,4 +164,4 @@ def rename_dir(in_fs, out_fs, layer_map=None, rename_method=None, num_threads=8)
     for file_name in in_fs.walk.files(filter=['*.exr']):
         files.append(in_fs.getsyspath(file_name))
 
-    return rename_files(files, out_fs, layer_map, rename_method, num_threads)
+    return rename_files(files, out_fs, layer_map, num_threads, multithreading)
