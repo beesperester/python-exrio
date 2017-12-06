@@ -8,8 +8,7 @@ import os
 import re
 import time
 
-from Queue import Queue, Empty
-from threading import Thread
+from multiprocessing import Pool, TimeoutError
 
 # exr
 import OpenEXR
@@ -27,28 +26,6 @@ class SameFileException(Exception):
 
 class LayerMapEmptyException(Exception):
     """ Layermap is empty exception. """
-
-# threads
-
-class RenameChannelsThread(Thread):
-    """ Rename channels thread. """
-
-    def __init__(self, queue=None):
-        super(RenameChannelsThread, self).__init__()
-
-        self._queue = queue
-
-    def run(self):
-        while not self._queue.empty():
-            args = self._queue.get()
-
-            self.process(args)
-
-            self._queue.task_done()
-
-    def process(self, args):
-        rename_channels(*args)
-
 
 # methods
 
@@ -136,14 +113,17 @@ def rename_channels(in_path, out_path, layer_map=None, rename_method=None):
     out_exr_file.close()
 
     # stop time
-    time_stop = time()
+    time_stop = time.time()
 
     # duration
     duration = time_stop - time_start
 
     logging.info('Renamed {num_channels} channels of {out_path} ({duration}s).'.format(num_channels=len(matched_layers.keys()), out_path=out_path, duration=duration))
 
-def rename_files(files, out_fs, layer_map=None, rename_method=None, num_threads=8):
+def rename_worker(args):
+    rename_channels(*args)
+
+def rename_files(files, out_fs, layer_map=None, rename_method=None, num_threads=None, multithreading=True):
     """ Rename layers in list of exr files and store at out_fs.
 
     Args:
@@ -154,11 +134,13 @@ def rename_files(files, out_fs, layer_map=None, rename_method=None, num_threads=
 
     Raises:
         SameFileException
-    """
+    """        
     logging.info('Started renaming of {} files.'.format(len(files)))
 
-    # create queue of rename tasks
-    queue = Queue()
+    if not num_threads:
+        num_threads = int(os.environ["NUMBER_OF_PROCESSORS"])
+
+    tasks = []
 
     for file_path in files:
         dirname, basename = os.path.split(file_path)
@@ -172,17 +154,19 @@ def rename_files(files, out_fs, layer_map=None, rename_method=None, num_threads=
 
         # rename_channels(file_path, out_path, layer_map, rename_method)
 
-        queue.put((file_path, out_path, layer_map, rename_method))
+        # queue.put((file_path, out_path, layer_map, rename_method))
 
-    # work queue
-    for index in range(0, num_threads):
-        thread = RenameChannelsThread(queue)
-        thread.daemon = True
-        thread.start()
+        tasks.append((file_path, out_path, layer_map, rename_method))
 
-    logging.info('Started {} threads.'.format(num_threads))    
+    if multithreading:
+        # run tasks in parallel
+        pool = Pool(processes=num_threads)
 
-    queue.join()
+        pool.map(rename_worker, tasks)
+    else:
+        # run tasks in order
+        for task in tasks:
+            rename_worker(task)
 
     logging.info('Finished renaming of {} files.'.format(len(files)))
 

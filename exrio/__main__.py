@@ -36,7 +36,7 @@ def main():
         r'position \(camera\)': 'position_camera'
     }
 
-    rename_dir(in_fs, out_fs, layer_map, None, int(os.environ["NUMBER_OF_PROCESSORS"]))
+    rename_dir(in_fs, out_fs, layer_map)
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
