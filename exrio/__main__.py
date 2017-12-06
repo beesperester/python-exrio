@@ -2,6 +2,7 @@
 
 # system
 import logging
+import os
 
 # filesystem
 from fs.osfs import OSFS
@@ -35,7 +36,7 @@ def main():
         r'position \(camera\)': 'position_camera'
     }
 
-    rename_dir(in_fs, out_fs, layer_map, None, 16)
+    rename_dir(in_fs, out_fs, layer_map, None, int(os.environ["NUMBER_OF_PROCESSORS"]))
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)

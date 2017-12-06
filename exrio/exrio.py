@@ -1,4 +1,4 @@
-""" Main python module. """
+""" Module of exr file operations. """
 
 # system
 import copy
@@ -14,6 +14,8 @@ from threading import Thread
 # exr
 import OpenEXR
 
+# exceptions
+
 class NoExrFileException(Exception):
     """ No EXR file exception. """
 
@@ -25,6 +27,30 @@ class SameFileException(Exception):
 
 class LayerMapEmptyException(Exception):
     """ Layermap is empty exception. """
+
+# threads
+
+class RenameChannelsThread(Thread):
+    """ Rename channels thread. """
+
+    def __init__(self, queue=None):
+        super(RenameChannelsThread, self).__init__()
+
+        self._queue = queue
+
+    def run(self):
+        while not self._queue.empty():
+            args = self._queue.get()
+
+            self.process(args)
+
+            self._queue.task_done()
+
+    def process(self, args):
+        rename_channels(*args)
+
+
+# methods
 
 def rename_layer_name(layer_name, replacement_name, replacement_format='{layer_name}.{channel_name}'):
     """ Rename layer with replacement.
@@ -131,27 +157,8 @@ def rename_files(files, out_fs, layer_map=None, rename_method=None, num_threads=
     """
     logging.info('Started renaming of {} files.'.format(len(files)))
 
+    # create queue of rename tasks
     queue = Queue()
-
-    def worker():
-        while True:
-            try:
-                callback = queue.get()
-                
-                if hasattr(callback, '__call__'):
-                    callback()
-                
-                queue.task_done()
-            except Empty:
-                logging.warning('Queue is empty')
-                break
-
-    for index in range(0, num_threads):
-        thread = Thread(target=worker)
-        thread.daemon = True
-        thread.start()
-
-    logging.info('Started {} threads.'.format(num_threads))
 
     for file_path in files:
         dirname, basename = os.path.split(file_path)
@@ -165,7 +172,15 @@ def rename_files(files, out_fs, layer_map=None, rename_method=None, num_threads=
 
         # rename_channels(file_path, out_path, layer_map, rename_method)
 
-        queue.put(lambda: rename_channels(file_path, out_path, layer_map, rename_method))
+        queue.put((file_path, out_path, layer_map, rename_method))
+
+    # work queue
+    for index in range(0, num_threads):
+        thread = RenameChannelsThread(queue)
+        thread.daemon = True
+        thread.start()
+
+    logging.info('Started {} threads.'.format(num_threads))    
 
     queue.join()
 
