@@ -28,7 +28,7 @@ def rechannel_file(in_path, out_path, layer_map=None):
     Raises:
         NoExrFileException
     """
-    logging.info('Start rechannel of {out_path}.'.format(out_path=out_path))
+    print 'Start rechannel of {out_path}.'.format(out_path=out_path)
 
     if in_path == out_path:
         raise SameFileException(out_path)
@@ -91,7 +91,7 @@ def rechannel_file(in_path, out_path, layer_map=None):
     # duration
     duration = round(time_stop - time_start)
 
-    logging.info('Rechanneld {num_channels} channels of {out_path} ({duration}s).'.format(num_channels=len(matched_layers.keys()), out_path=out_path, duration=duration))
+    print 'Rechanneld {num_channels} channels of {out_path} ({duration}s).'.format(num_channels=len(matched_layers.keys()), out_path=out_path, duration=duration)
 
 def rechannel_worker(args):
     rechannel_file(*args)
@@ -109,7 +109,7 @@ def rechannel_files(files, out_fs, layer_map=None, num_threads=None, multithread
     Raises:
         SameFileException
     """        
-    logging.info('Started renaming of {} files.'.format(len(files)))
+    print 'Started renaming of {} files.'.format(len(files))
 
     if not num_threads:
         num_threads = int(os.environ["NUMBER_OF_PROCESSORS"])
@@ -134,7 +134,7 @@ def rechannel_files(files, out_fs, layer_map=None, num_threads=None, multithread
         for task in tasks:
             rechannel_worker(task)
 
-    logging.info('Finished renaming of {} files.'.format(len(files)))
+    print 'Finished renaming of {} files.'.format(len(files))
 
 def rechannel_dir(in_fs, out_fs, layer_map=None, num_threads=None, multithreading=True):
     """ Rechannel exr files in in_fs.

@@ -86,11 +86,11 @@ def handle_arguments():
     try:
         args = parser.parse_args()
     except ArgumentParserError as error:
-        logging.error(error)
+        print error
 
         parser.print_help()
 
-        quit()
+        return
 
     if args.module == 'rechannel':
         handle_rechannel(**vars(args))
@@ -121,9 +121,9 @@ def handle_rechannel(**kwargs):
     try:
         out_fs = OSFS(args.output)
     except CreateFailed:
-        logging.error('Output {} does not exist.'.format(args.output))
+        print 'Output {} does not exist.'.format(args.output)
 
-        quit()
+        return
 
     # split map path
     dirname, basename = os.path.split(unicode(args.map))
@@ -137,11 +137,11 @@ def handle_rechannel(**kwargs):
                 except Exception as error:
                     logging.error(error)
 
-                    quit()
+                    return
     except CreateFailed:
-        logging.error('Map {} does not exist.'.format(args.output))
+        print 'Map {} does not exist.'.format(args.output)
 
-        quit()
+        return
 
     # split input path
     dirname, basename = os.path.split(unicode(args.input))
@@ -155,9 +155,9 @@ def handle_rechannel(**kwargs):
         elif in_fs.isdir(basename):
             rechannel_dir(in_fs.opendir(basename), out_fs, layer_map, args.num_threads, bool(args.multithreading))
     except CreateFailed:
-        logging.error('Input {} does not exist.'.format(args.input))
+        print 'Input {} does not exist.'.format(args.input)
 
-        quit()
+        return
 
 def handle_preview(**kwargs):
     """ Handle preview actions.
@@ -180,9 +180,9 @@ def handle_preview(**kwargs):
     try:
         out_fs = OSFS(args.output)
     except CreateFailed:
-        logging.error('Output {} does not exist.'.format(args.output))
+        print 'Output {} does not exist.'.format(args.output)
 
-        quit()
+        return
 
     # split input path
     dirname, basename = os.path.split(unicode(args.input))
@@ -200,9 +200,9 @@ def handle_preview(**kwargs):
         elif in_fs.isdir(basename):
             preview_dir(in_fs.opendir(basename), out_fs, args.num_threads, bool(args.multithreading))
     except CreateFailed:
-        logging.error('Input {} does not exist.'.format(args.input))
+        print 'Input {} does not exist.'.format(args.input)'
 
-        quit()
+        return
 
 def handle_inspect(**kwargs):
     """ Handle inspect actions.
@@ -230,9 +230,9 @@ def handle_inspect(**kwargs):
         elif in_fs.isdir(basename):
             inspect_dir(in_fs.opendir(basename))
     except CreateFailed:
-        logging.error('Input {} does not exist.'.format(args.input))
+        print 'Input {} does not exist.'.format(args.input)
 
-        quit()
+        return
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)

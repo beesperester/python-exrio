@@ -27,7 +27,7 @@ def preview_file(in_path, out_path):
     Raises:
         NoExrFileException
     """
-    logging.info('Started preview of {out_path}.'.format(out_path=out_path))
+    print 'Started preview of {out_path}.'.format(out_path=out_path)
 
     if in_path == out_path:
         raise SameFileException(out_path)
@@ -73,7 +73,7 @@ def preview_file(in_path, out_path):
     # duration
     duration = round(time_stop - time_start)
 
-    logging.info('Finished preview for {out_path} ({duration}s).'.format(out_path=out_path, duration=duration))
+    print 'Finished preview for {out_path} ({duration}s).'.format(out_path=out_path, duration=duration)
 
 def preview_worker(args):
     """ TODO: add docstring. """
@@ -92,7 +92,7 @@ def preview_files(files, out_fs, num_threads=None, multithreading=True):
     Raises:
         SameFileException
     """        
-    logging.info('Started preview of {} files.'.format(len(files)))
+    print 'Started preview of {} files.'.format(len(files))
 
     if not num_threads:
         num_threads = int(os.environ["NUMBER_OF_PROCESSORS"])
@@ -121,7 +121,7 @@ def preview_files(files, out_fs, num_threads=None, multithreading=True):
         for task in tasks:
             preview_worker(task)
 
-    logging.info('Finished preview of {} files.'.format(len(files)))
+    print 'Finished preview of {} files.'.format(len(files))
 
 def preview_dir(in_fs, out_fs, num_threads=None, multithreading=True):
     """ TODO: add docstring.

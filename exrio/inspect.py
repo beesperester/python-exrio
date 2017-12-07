@@ -66,7 +66,7 @@ def inspect_file(in_path):
     # duration
     duration = round(time_stop - time_start)
 
-    logging.info('Finished inspect for {in_path} ({duration}s).'.format(in_path=in_path, duration=duration))
+    print 'Finished inspect for {in_path} ({duration}s).'.format(in_path=in_path, duration=duration)
 
 def inspect_files(files):
     """ TODO: add docstring.
@@ -74,7 +74,7 @@ def inspect_files(files):
     Args:
         files (list): List of exr files
     """
-    logging.info('Started inspect of {} files.'.format(len(files)))
+    print 'Started inspect of {} files.'.format(len(files))
 
     tasks = []
 
@@ -85,7 +85,7 @@ def inspect_files(files):
     for task in tasks:
         inspect_file(*task)
 
-    logging.info('Finished inspect of {} files.'.format(len(files)))
+    print 'Finished inspect of {} files.'.format(len(files))
 
 def inspect_dir(in_fs):
     """ TODO: add docstring.
