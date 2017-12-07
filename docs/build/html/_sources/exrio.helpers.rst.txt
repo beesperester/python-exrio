@@ -12,6 +12,14 @@ exrio\.helpers\.dict\_helpers module
     :undoc-members:
     :show-inheritance:
 
+exrio\.helpers\.fs\_helpers module
+----------------------------------
+
+.. automodule:: exrio.helpers.fs_helpers
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 exrio\.helpers\.json\_helpers module
 ------------------------------------
 
