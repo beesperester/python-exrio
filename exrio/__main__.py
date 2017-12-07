@@ -31,12 +31,12 @@ def handle_arguments():
     """ Commandline arguments entrypoint. """
 
     # argument parser
-    parser = ThrowingArgumentParser(description='Commandline tool for processing .exr-files. Create previews or rename layers and channels.', prog='exrio')
+    parser = ThrowingArgumentParser(description='Commandline tool for processing .exr files. Create previews or rename layers and channels.', prog='exrio')
 
     subparsers = parser.add_subparsers(help='Submodule commands.', dest='module')
 
     # create rechannel subparser
-    rechannel_parser = subparsers.add_parser('rechannel', help='Rename layers and channels in exr-files and directories containing exr-files.')
+    rechannel_parser = subparsers.add_parser('rechannel', help='Rename layers and channels in EXR files and directories containing EXR files.')
 
     # input path argument
     rechannel_parser.add_argument('input', type=str, help='Path to an EXR file or a directory containing EXR files.')
@@ -51,6 +51,7 @@ def handle_arguments():
         '^(?P<layer>g)$': 'G',
         '^(?P<layer>b)$': 'B',
         '^(?P<layer>a)$': 'A',
+        '(?P<layer>diffuse)\.(?P<channel>\S+)': 'diffuse'
     }
 
     rechannel_parser.add_argument('map', type=str, help='Path to a JSON file containing the layers to rename. Use regular expression to find the name and replace it with a new name. Example: {}'.format(json.dumps(layer_map)))
@@ -62,7 +63,7 @@ def handle_arguments():
     rechannel_parser.add_argument('--multithreading', type=int, default=1, help='Use multithreading (default=1).')
 
     # create preview subparser
-    preview_parser = subparsers.add_parser('preview', help='Create previews for exr-files and directories containing exr-files.')
+    preview_parser = subparsers.add_parser('preview', help='Create previews for EXR files and directories containing EXR files.')
 
     # input path argument
     preview_parser.add_argument('input', type=str, help='Path to an EXR file or a directory containing EXR files.')
@@ -77,7 +78,7 @@ def handle_arguments():
     preview_parser.add_argument('--multithreading', type=int, default=1, help='Use multithreading (default=1).')
 
     # create inspect subparser
-    inspect_parser = subparsers.add_parser('inspect', help='Inspect exr-files or a directory containing EXR files.')
+    inspect_parser = subparsers.add_parser('inspect', help='Inspect EXR files or a directory containing EXR files.')
 
     # input path argument
     inspect_parser.add_argument('input', type=str, help='Path to an EXR file or a directory containing EXR files.')

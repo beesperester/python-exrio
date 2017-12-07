@@ -73,7 +73,7 @@ def inspect_files(files):
 
     Args:
         files (list): List of exr files
-    """        
+    """
     logging.info('Started inspect of {} files.'.format(len(files)))
 
     tasks = []
