@@ -6,7 +6,7 @@ import os
 import re
 import time
 
-from multiprocessing import Pool
+from multiprocessing import Pool, freeze_support
 
 # exr
 import OpenEXR
@@ -107,7 +107,9 @@ def rechannel_files(files, out_fs, layer_map=None, num_threads=None, multithread
 
     Raises:
         SameFileException
-    """        
+    """
+    freeze_support()
+    
     print 'Started renaming of {} files.'.format(len(files))
 
     if not num_threads:

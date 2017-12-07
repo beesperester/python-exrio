@@ -4,7 +4,7 @@
 import os
 import time
 
-from multiprocessing import Pool
+from multiprocessing import Pool, freeze_support
 
 # image manipulation
 import OpenEXR
@@ -88,7 +88,9 @@ def preview_files(files, out_fs, num_threads=None, multithreading=True):
 
     Raises:
         SameFileException
-    """        
+    """
+    freeze_support()
+    
     print 'Started preview of {} files.'.format(len(files))
 
     if not num_threads:

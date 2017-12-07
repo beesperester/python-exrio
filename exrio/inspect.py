@@ -2,10 +2,7 @@
 
 # system
 import json
-import logging
 import time
-
-from multiprocessing import Pool
 
 # image manipulation
 import OpenEXR

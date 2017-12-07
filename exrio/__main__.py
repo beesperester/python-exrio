@@ -6,6 +6,8 @@ import json
 import logging
 import os
 
+from multiprocessing import freeze_support
+
 # filesystem
 from fs.osfs import OSFS
 from fs.errors import CreateFailed
@@ -244,6 +246,8 @@ def handle_inspect(**kwargs):
         return
 
 if __name__ == '__main__':
+    freeze_support()
+
     logging.basicConfig(level=logging.DEBUG)
 
     handle_arguments()
