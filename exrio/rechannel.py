@@ -1,8 +1,7 @@
-""" Module of exr file operations. """
+""" Rechannel exr module. """
 
 # system
 import copy
-import json
 import logging
 import os
 import re
@@ -14,18 +13,7 @@ from multiprocessing import Pool
 import OpenEXR
 
 # exceptions
-
-class NoExrFileException(Exception):
-    """ No EXR file exception. """
-
-class SameDirectoryException(Exception):
-    """ Same directory exception. """
-
-class SameFileException(Exception):
-    """ Same file exception. """
-
-class LayerMapEmptyException(Exception):
-    """ Layermap is empty exception. """
+from exrio.exrio_exceptions import NoExrFileException, SameFileException
 
 # methods
 
@@ -101,7 +89,7 @@ def rechannel_file(in_path, out_path, layer_map=None):
     time_stop = time.time()
 
     # duration
-    duration = time_stop - time_start
+    duration = round(time_stop - time_start)
 
     logging.info('Rechanneld {num_channels} channels of {out_path} ({duration}s).'.format(num_channels=len(matched_layers.keys()), out_path=out_path, duration=duration))
 
