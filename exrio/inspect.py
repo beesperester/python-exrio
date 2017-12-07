@@ -1,19 +1,14 @@
 """ Preview exr module. """
 
 # system
-import copy
 import json
 import logging
-import os
-import re
 import time
 
 from multiprocessing import Pool
 
 # image manipulation
 import OpenEXR
-import Imath
-import Image
 
 # exceptions
 from exrio.exrio_exceptions import NoExrFileException, SameFileException
@@ -30,7 +25,7 @@ def inspect_file(in_path):
     Raises:
         NoExrFileException
     """
-    logging.info('Started inspect of {in_path}.'.format(in_path=in_path))
+    print 'Started inspect of {in_path}.'.format(in_path=in_path)
 
     # start time
     time_start = time.time()

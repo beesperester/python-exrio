@@ -17,6 +17,7 @@ from exrio.inspect import inspect_dir, inspect_file
 
 # helpers
 from exrio.helpers.dict_helpers import dict_to_namedtuple
+from exrio.helpers.fs_helpers import assure_fs
 
 class ArgumentParserError(Exception):
     """ Argument parser error. """
@@ -30,21 +31,6 @@ class ThrowingArgumentParser(argparse.ArgumentParser):
 def handle_arguments():
     """ Commandline arguments entrypoint. """
 
-    # argument parser
-    parser = ThrowingArgumentParser(description='Commandline tool for processing .exr files. Create previews or rename layers and channels.', prog='exrio')
-
-    subparsers = parser.add_subparsers(help='Submodule commands.', dest='module')
-
-    # create rechannel subparser
-    rechannel_parser = subparsers.add_parser('rechannel', help='Rename layers and channels in EXR files and directories containing EXR files.')
-
-    # input path argument
-    rechannel_parser.add_argument('input', type=str, help='Path to an EXR file or a directory containing EXR files.')
-
-    # output path argument
-    rechannel_parser.add_argument('output', type=str, help='Path to output directory.')
-
-    # layer map argument
     # default layer map
     layer_map = {
         '^(?P<layer>r)$': 'R',
@@ -54,6 +40,39 @@ def handle_arguments():
         '(?P<layer>diffuse)\.(?P<channel>\S+)': 'diffuse'
     }
 
+    # argument parser
+    parser = ThrowingArgumentParser(description='Commandline tool for processing .exr files. Create previews or rename layers and channels.', prog='exrio')
+
+    subparsers = parser.add_subparsers(help='Submodule commands.', dest='module')
+
+    # create rechannel subparser
+    rechannel_parser = subparsers.add_parser('rechannel', help='Rename layers and channels in EXR files and directories containing EXR files.')    
+
+    # example
+    rechannel_parser.add_argument('--example', action='store_true', help='Create example map at current working directory.')
+
+    # extra step to check if an example map should be created
+    try:
+        args = parser.parse_args()
+
+        if args.module == 'rechannel':
+            if args.example:
+                cwd_fs = OSFS(u'.')
+
+                with cwd_fs.open(u'example.json', mode='w') as file_handle:
+                    file_handle.write(unicode(json.dumps(layer_map, indent=2)))
+                
+                return
+    except ArgumentParserError as error:
+        pass
+
+    # input path argument
+    rechannel_parser.add_argument('input', default=os.getcwd(), type=str, help='Path to an EXR file or a directory containing EXR files.')
+
+    # output path argument
+    rechannel_parser.add_argument('output', type=str, help='Path to output directory.')
+
+    # layer map argument
     rechannel_parser.add_argument('map', type=str, help='Path to a JSON file containing the layers to rename. Use regular expression to find the name and replace it with a new name. Example: {}'.format(json.dumps(layer_map)))
 
     # number of threads
@@ -118,12 +137,7 @@ def handle_rechannel(**kwargs):
     args = dict_to_namedtuple(default_args)
 
     # open output filesystem
-    try:
-        out_fs = OSFS(args.output)
-    except CreateFailed:
-        print 'Output {} does not exist.'.format(args.output)
-
-        return
+    out_fs = assure_fs(args.output)
 
     # split map path
     dirname, basename = os.path.split(unicode(args.map))
@@ -177,12 +191,7 @@ def handle_preview(**kwargs):
     args = dict_to_namedtuple(default_args)
 
     # open output filesystem
-    try:
-        out_fs = OSFS(args.output)
-    except CreateFailed:
-        print 'Output {} does not exist.'.format(args.output)
-
-        return
+    out_fs = assure_fs(args.output)
 
     # split input path
     dirname, basename = os.path.split(unicode(args.input))
@@ -200,7 +209,7 @@ def handle_preview(**kwargs):
         elif in_fs.isdir(basename):
             preview_dir(in_fs.opendir(basename), out_fs, args.num_threads, bool(args.multithreading))
     except CreateFailed:
-        print 'Input {} does not exist.'.format(args.input)'
+        print 'Input {} does not exist.'.format(args.input)
 
         return
 

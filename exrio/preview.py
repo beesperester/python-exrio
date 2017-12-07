@@ -1,10 +1,7 @@
 """ Preview exr module. """
 
 # system
-import copy
-import logging
 import os
-import re
 import time
 
 from multiprocessing import Pool
