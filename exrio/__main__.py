@@ -5,6 +5,7 @@ import argparse
 import json
 import logging
 import os
+import sys
 
 from multiprocessing import freeze_support
 
@@ -21,14 +22,55 @@ from exrio.inspect import inspect_dir, inspect_file
 from exrio.helpers.dict_helpers import dict_to_namedtuple
 from exrio.helpers.fs_helpers import assure_fs
 
+# overrides
+
+try:
+    # Python 3.4+
+    if sys.platform.startswith('win'):
+        import multiprocessing.popen_spawn_win32 as forking
+    else:
+        import multiprocessing.popen_fork as forking
+except ImportError:
+    import multiprocessing.forking as forking
+
+if sys.platform.startswith('win'):
+    # First define a modified version of Popen.
+    class _Popen(forking.Popen):
+        def __init__(self, *args, **kw):
+            if hasattr(sys, 'frozen'):
+                # We have to set original _MEIPASS2 value from sys._MEIPASS
+                # to get --onefile mode working.
+                os.putenv('_MEIPASS2', sys._MEIPASS)
+            try:
+                super(_Popen, self).__init__(*args, **kw)
+            finally:
+                if hasattr(sys, 'frozen'):
+                    # On some platforms (e.g. AIX) 'os.unsetenv()' is not
+                    # available. In those cases we cannot delete the variable
+                    # but only set it to the empty string. The bootloader
+                    # can handle this case.
+                    if hasattr(os, 'unsetenv'):
+                        os.unsetenv('_MEIPASS2')
+                    else:
+                        os.putenv('_MEIPASS2', '')
+
+    # Second override 'Popen' class with our modified version.
+    forking.Popen = _Popen
+
+# exceptions
+
 class ArgumentParserError(Exception):
     """ Argument parser error. """
+
+# classes
 
 class ThrowingArgumentParser(argparse.ArgumentParser):
     """ Custom argument parser class. """
 
     def error(self, message):
         raise ArgumentParserError(message)
+
+# methods
 
 def handle_arguments():
     """ Commandline arguments entrypoint. """
