@@ -5,14 +5,14 @@ import copy
 import os
 import re
 import time
-
-from multiprocessing import Pool
-
 # exr
 import OpenEXR
 
 # exceptions
 from exrio.exrio_exceptions import NoExrFileException, SameFileException
+
+# helpers
+from exrio.helpers.multiprocessing_helpers import run
 
 # methods
 
@@ -92,26 +92,20 @@ def rechannel_file(in_path, out_path, layer_map=None):
 
     print 'Rechanneld {num_channels} channels of {out_path} ({duration}s).'.format(num_channels=len(matched_layers.keys()), out_path=out_path, duration=duration)
 
-def rechannel_worker(args):
-    rechannel_file(*args)
-
-def rechannel_files(files, out_fs, layer_map=None, num_threads=None, multithreading=True):
-    """ Rechannel layers in list of exr files and store at out_fs.
+def rechannel_files(files, out_fs, layer_map=None, num_threads=None, multiprocessing=True):
+    """ Rechannel list of exr files and use multiprocessing.
 
     Args:
         files (list): List of exr files
         out_fs (fs): Output filesystem
         layer_map (dict): regular expression / replacement name pairs
         num_threads (int): Number of threads to use
-        multithreading (bool): Use multithreading
+        multiprocessing (bool): Use multiprocessing
 
     Raises:
         SameFileException
     """
     print 'Started renaming of {} files.'.format(len(files))
-
-    if not num_threads:
-        num_threads = int(os.environ["NUMBER_OF_PROCESSORS"])
 
     tasks = []
 
@@ -121,17 +115,9 @@ def rechannel_files(files, out_fs, layer_map=None, num_threads=None, multithread
         # get out_path
         out_path = out_fs.getsyspath(unicode(basename))
 
-        tasks.append((file_path, out_path, layer_map))
+        tasks.append((rechannel_file, file_path, out_path, layer_map))
 
-    if multithreading:
-        # run tasks in parallel
-        pool = Pool(processes=num_threads)
-
-        pool.map(rechannel_worker, tasks)
-    else:
-        # run tasks in order
-        for task in tasks:
-            rechannel_worker(task)
+    run(tasks, num_threads, multiprocessing)
 
     print 'Finished renaming of {} files.'.format(len(files))
 

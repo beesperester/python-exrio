@@ -4,8 +4,6 @@
 import os
 import time
 
-from multiprocessing import Pool
-
 # image manipulation
 import OpenEXR
 import Imath
@@ -14,8 +12,11 @@ import Image
 # exceptions
 from exrio.exrio_exceptions import NoExrFileException, SameFileException
 
+# helpers
+from exrio.helpers.multiprocessing_helpers import run
+
 def preview_file(in_path, out_path):
-    """ TODO: add docstring.
+    """ Create preview of exr files by normalizing the color range to 8bit.
 
     Args:
         in_path (str): File to read
@@ -72,27 +73,19 @@ def preview_file(in_path, out_path):
 
     print 'Finished preview for {out_path} ({duration}s).'.format(out_path=out_path, duration=duration)
 
-def preview_worker(args):
-    """ TODO: add docstring. """
-
-    preview_file(*args)
-
-def preview_files(files, out_fs, num_threads=None, multithreading=True):
-    """ TODO: add docstring.
+def preview_files(files, out_fs, num_threads=None, multiprocessing=True):
+    """ Create previews for a list of files and use multiprocessing.
 
     Args:
         files (list): List of exr files
         out_fs (fs): Output filesystem
         num_threads (int): Number of threads to use
-        multithreading (bool): Use multithreading
+        multiprocessing (bool): Use multiprocessing
 
     Raises:
         SameFileException
     """
     print 'Started preview of {} files.'.format(len(files))
-
-    if not num_threads:
-        num_threads = int(os.environ["NUMBER_OF_PROCESSORS"])
 
     tasks = []
 
@@ -106,22 +99,14 @@ def preview_files(files, out_fs, num_threads=None, multithreading=True):
         # get out_path
         out_path = out_fs.getsyspath(out_name)
 
-        tasks.append((file_path, out_path))
+        tasks.append((preview_file, file_path, out_path))
 
-    if multithreading:
-        # run tasks in parallel
-        pool = Pool(processes=num_threads)
-
-        pool.map(preview_worker, tasks)
-    else:
-        # run tasks in order
-        for task in tasks:
-            preview_worker(task)
+    run(tasks, num_threads, multiprocessing)
 
     print 'Finished preview of {} files.'.format(len(files))
 
 def preview_dir(in_fs, out_fs, num_threads=None, multithreading=True):
-    """ TODO: add docstring.
+    """ Create list of exr files in directory and create previews.
 
     Args:
         in_fs (fs): Input filesystem

@@ -16,11 +16,13 @@ def assure_fs(path):
     Returns:
         fs
     """
-    if os.pathsep in path:
-        separator = os.pathsep
-    else:
-        separator = '/'
+    # possible separators
+    separators = [u'/', u'\\']
 
+    # find used separator
+    separator = [sep for sep in separators if sep in path][0]
+
+    # split path into parts using found separator
     path_parts = unicode(path).split(separator)
 
     def reduce_path(carry_fs, value):
@@ -34,12 +36,18 @@ def assure_fs(path):
             fs
         """
         if not isinstance(carry_fs, FS):
-            carry_fs = OSFS(carry_fs + '/')
+            carry_fs = OSFS(carry_fs + separator)
 
         if not carry_fs.isdir(value):
             carry_fs.makedirs(value)
 
-        return carry_fs.opendir(value)
+        # open next carry_fs
+        next_carry_fs = OSFS(carry_fs.getsyspath(value))
+
+        # close carry_fs
+        carry_fs.close()
+
+        return next_carry_fs
 
     return reduce(reduce_path, path_parts)
 
