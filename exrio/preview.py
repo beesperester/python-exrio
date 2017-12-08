@@ -66,7 +66,11 @@ def preview_file(in_path, out_path, layer=None):
 
         if selected_channels:
             if len(selected_channels) < 3:
+                # create greyscale image from first channel
                 channels = [selected_channels[0], selected_channels[0], selected_channels[0]]
+            elif len(selected_channels) > 3:
+                # maximum of 3 channels
+                channels = selected_channels[:3]
             else:
                 channels = selected_channels
 

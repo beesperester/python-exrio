@@ -257,7 +257,10 @@ def handle_preview(**kwargs):
     out_fs = assure_fs(args.output)
 
     # join layer
-    layer = ' '.join(args.layer)
+    layer = None
+
+    if args.layer:
+        layer = ' '.join(args.layer)
 
     # split input path
     dirname, basename = os.path.split(unicode(args.input))
