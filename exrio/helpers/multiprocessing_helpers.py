@@ -6,6 +6,9 @@ import time
 
 from multiprocessing import Pool
 
+# exrio
+from exrio import console
+
 def _task_worker(args):
     """ Run args if is callable.
 
@@ -32,11 +35,13 @@ def run(tasks, num_threads=None, multiprocessing=True):
         multiprocessing (bool): Use multiprocessing
     """
     if not num_threads:
-        int(os.environ["NUMBER_OF_PROCESSORS"])
+        num_threads = int(os.environ["NUMBER_OF_PROCESSORS"])
 
     # only spawn maxium of len(tasks) threads if num_threads larger than len(tasks)
     if num_threads > len(tasks):
         num_threads = len(tasks)
+
+    console.debug('Number of threads for multiprocessing: {}'.format(num_threads))
 
     if multiprocessing:
         # run tasks in parallel
