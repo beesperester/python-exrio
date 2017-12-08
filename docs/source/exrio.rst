@@ -11,6 +11,14 @@ Subpackages
 Submodules
 ----------
 
+exrio\.console module
+---------------------
+
+.. automodule:: exrio.console
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 exrio\.exrio\_exceptions module
 -------------------------------
 

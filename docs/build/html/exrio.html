@@ -93,6 +93,7 @@
 <li><a class="reference internal" href="#">exrio package</a><ul>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-exrio.console">exrio.console module</a></li>
 <li><a class="reference internal" href="#module-exrio.exrio_exceptions">exrio.exrio_exceptions module</a></li>
 <li><a class="reference internal" href="#module-exrio.inspect">exrio.inspect module</a></li>
 <li><a class="reference internal" href="#module-exrio.preview">exrio.preview module</a></li>
@@ -174,6 +175,8 @@
 <li class="toctree-l2"><a class="reference internal" href="exrio.helpers.html#module-exrio.helpers.dict_helpers">exrio.helpers.dict_helpers module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="exrio.helpers.html#module-exrio.helpers.fs_helpers">exrio.helpers.fs_helpers module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="exrio.helpers.html#module-exrio.helpers.json_helpers">exrio.helpers.json_helpers module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="exrio.helpers.html#module-exrio.helpers.list_helpers">exrio.helpers.list_helpers module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="exrio.helpers.html#module-exrio.helpers.multiprocessing_helpers">exrio.helpers.multiprocessing_helpers module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="exrio.helpers.html#module-exrio.helpers">Module contents</a></li>
 </ul>
 </li>
@@ -182,6 +185,30 @@
 </div>
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-exrio.console">
+<span id="exrio-console-module"></span><h2>exrio.console module<a class="headerlink" href="#module-exrio.console" title="Permalink to this headline">¶</a></h2>
+<p>Console output module.</p>
+<dl class="function">
+<dt id="exrio.console.debug">
+<code class="descclassname">exrio.console.</code><code class="descname">debug</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exrio/console.html#debug"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exrio.console.debug" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="exrio.console.error">
+<code class="descclassname">exrio.console.</code><code class="descname">error</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exrio/console.html#error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exrio.console.error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="exrio.console.info">
+<code class="descclassname">exrio.console.</code><code class="descname">info</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exrio/console.html#info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exrio.console.info" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="exrio.console.warning">
+<code class="descclassname">exrio.console.</code><code class="descname">warning</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exrio/console.html#warning"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exrio.console.warning" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </div>
 <div class="section" id="module-exrio.exrio_exceptions">
 <span id="exrio-exrio-exceptions-module"></span><h2>exrio.exrio_exceptions module<a class="headerlink" href="#module-exrio.exrio_exceptions" title="Permalink to this headline">¶</a></h2>
@@ -268,8 +295,8 @@
 <p>Preview exr module.</p>
 <dl class="function">
 <dt id="exrio.preview.preview_dir">
-<code class="descclassname">exrio.preview.</code><code class="descname">preview_dir</code><span class="sig-paren">(</span><em>in_fs</em>, <em>out_fs</em>, <em>num_threads=None</em>, <em>multithreading=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exrio/preview.html#preview_dir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exrio.preview.preview_dir" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO: add docstring.</p>
+<code class="descclassname">exrio.preview.</code><code class="descname">preview_dir</code><span class="sig-paren">(</span><em>in_fs</em>, <em>out_fs</em>, <em>num_threads=None</em>, <em>multithreading=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exrio/preview.html#preview_dir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exrio.preview.preview_dir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create list of exr files in directory and create previews.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -288,8 +315,8 @@
 
 <dl class="function">
 <dt id="exrio.preview.preview_file">
-<code class="descclassname">exrio.preview.</code><code class="descname">preview_file</code><span class="sig-paren">(</span><em>in_path</em>, <em>out_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exrio/preview.html#preview_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exrio.preview.preview_file" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO: add docstring.</p>
+<code class="descclassname">exrio.preview.</code><code class="descname">preview_file</code><span class="sig-paren">(</span><em>in_path</em>, <em>out_path</em>, <em>layer=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exrio/preview.html#preview_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exrio.preview.preview_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create preview of exr files by normalizing the color range to 8bit.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -309,8 +336,8 @@
 
 <dl class="function">
 <dt id="exrio.preview.preview_files">
-<code class="descclassname">exrio.preview.</code><code class="descname">preview_files</code><span class="sig-paren">(</span><em>files</em>, <em>out_fs</em>, <em>num_threads=None</em>, <em>multithreading=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exrio/preview.html#preview_files"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exrio.preview.preview_files" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO: add docstring.</p>
+<code class="descclassname">exrio.preview.</code><code class="descname">preview_files</code><span class="sig-paren">(</span><em>files</em>, <em>out_fs</em>, <em>num_threads=None</em>, <em>multiprocessing=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exrio/preview.html#preview_files"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exrio.preview.preview_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create previews for a list of files and use multiprocessing.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -319,7 +346,7 @@
 <li><strong>files</strong> (<em>list</em>) – List of exr files</li>
 <li><strong>out_fs</strong> (<em>fs</em>) – Output filesystem</li>
 <li><strong>num_threads</strong> (<em>int</em>) – Number of threads to use</li>
-<li><strong>multithreading</strong> (<em>bool</em>) – Use multithreading</li>
+<li><strong>multiprocessing</strong> (<em>bool</em>) – Use multiprocessing</li>
 </ul>
 </td>
 </tr>
@@ -330,19 +357,13 @@
 </table>
 </dd></dl>
 
-<dl class="function">
-<dt id="exrio.preview.preview_worker">
-<code class="descclassname">exrio.preview.</code><code class="descname">preview_worker</code><span class="sig-paren">(</span><em>args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exrio/preview.html#preview_worker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exrio.preview.preview_worker" title="Permalink to this definition">¶</a></dt>
-<dd><p>TODO: add docstring.</p>
-</dd></dl>
-
 </div>
 <div class="section" id="module-exrio.rechannel">
 <span id="exrio-rechannel-module"></span><h2>exrio.rechannel module<a class="headerlink" href="#module-exrio.rechannel" title="Permalink to this headline">¶</a></h2>
 <p>Rechannel exr module.</p>
 <dl class="function">
 <dt id="exrio.rechannel.rechannel_dir">
-<code class="descclassname">exrio.rechannel.</code><code class="descname">rechannel_dir</code><span class="sig-paren">(</span><em>in_fs</em>, <em>out_fs</em>, <em>layer_map=None</em>, <em>num_threads=None</em>, <em>multithreading=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exrio/rechannel.html#rechannel_dir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exrio.rechannel.rechannel_dir" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">exrio.rechannel.</code><code class="descname">rechannel_dir</code><span class="sig-paren">(</span><em>in_fs</em>, <em>out_fs</em>, <em>layer_map=None</em>, <em>num_threads=None</em>, <em>multithreading=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exrio/rechannel.html#rechannel_dir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exrio.rechannel.rechannel_dir" title="Permalink to this definition">¶</a></dt>
 <dd><p>Rechannel exr files in in_fs.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -385,8 +406,8 @@
 
 <dl class="function">
 <dt id="exrio.rechannel.rechannel_files">
-<code class="descclassname">exrio.rechannel.</code><code class="descname">rechannel_files</code><span class="sig-paren">(</span><em>files</em>, <em>out_fs</em>, <em>layer_map=None</em>, <em>num_threads=None</em>, <em>multithreading=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exrio/rechannel.html#rechannel_files"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exrio.rechannel.rechannel_files" title="Permalink to this definition">¶</a></dt>
-<dd><p>Rechannel layers in list of exr files and store at out_fs.</p>
+<code class="descclassname">exrio.rechannel.</code><code class="descname">rechannel_files</code><span class="sig-paren">(</span><em>files</em>, <em>out_fs</em>, <em>layer_map=None</em>, <em>num_threads=None</em>, <em>multiprocessing=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exrio/rechannel.html#rechannel_files"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exrio.rechannel.rechannel_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rechannel list of exr files and use multiprocessing.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -396,7 +417,7 @@
 <li><strong>out_fs</strong> (<em>fs</em>) – Output filesystem</li>
 <li><strong>layer_map</strong> (<em>dict</em>) – regular expression / replacement name pairs</li>
 <li><strong>num_threads</strong> (<em>int</em>) – Number of threads to use</li>
-<li><strong>multithreading</strong> (<em>bool</em>) – Use multithreading</li>
+<li><strong>multiprocessing</strong> (<em>bool</em>) – Use multiprocessing</li>
 </ul>
 </td>
 </tr>
@@ -406,11 +427,6 @@
 </tbody>
 </table>
 </dd></dl>
-
-<dl class="function">
-<dt id="exrio.rechannel.rechannel_worker">
-<code class="descclassname">exrio.rechannel.</code><code class="descname">rechannel_worker</code><span class="sig-paren">(</span><em>args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/exrio/rechannel.html#rechannel_worker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#exrio.rechannel.rechannel_worker" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
 
 </div>
 <div class="section" id="module-exrio">

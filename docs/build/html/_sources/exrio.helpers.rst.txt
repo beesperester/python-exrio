@@ -28,6 +28,22 @@ exrio\.helpers\.json\_helpers module
     :undoc-members:
     :show-inheritance:
 
+exrio\.helpers\.list\_helpers module
+------------------------------------
+
+.. automodule:: exrio.helpers.list_helpers
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+exrio\.helpers\.multiprocessing\_helpers module
+-----------------------------------------------
+
+.. automodule:: exrio.helpers.multiprocessing_helpers
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 
 Module contents
 ---------------
