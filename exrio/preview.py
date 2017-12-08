@@ -76,7 +76,7 @@ def preview_file(in_path, out_path):
 
     console.info('Finished preview for {out_path} ({duration}s).'.format(out_path=os.path.basename(out_path), duration=duration))
 
-def preview_files(files, out_fs, num_threads=None, multiprocessing=True):
+def preview_files(files, out_fs, num_threads=None, multiprocessing=True, **kwargs):
     """ Create previews for a list of files and use multiprocessing.
 
     Args:
@@ -97,6 +97,10 @@ def preview_files(files, out_fs, num_threads=None, multiprocessing=True):
 
         filename, extension = os.path.splitext(basename)
 
+        # prepend prefix to filename
+        if 'prefix' in kwargs and kwargs['prefix']:
+            filename = kwargs['prefix'] + filename
+
         out_name = unicode(filename + '.jpg')
 
         # get out_path
@@ -108,7 +112,7 @@ def preview_files(files, out_fs, num_threads=None, multiprocessing=True):
 
     console.info('Finished preview of {} files.'.format(len(files)))
 
-def preview_dir(in_fs, out_fs, num_threads=None, multithreading=True):
+def preview_dir(in_fs, out_fs, num_threads=None, multithreading=True, **kwargs):
     """ Create list of exr files in directory and create previews.
 
     Args:
@@ -123,4 +127,4 @@ def preview_dir(in_fs, out_fs, num_threads=None, multithreading=True):
     for file_name in in_fs.walk.files(filter=['*.exr']):
         files.append(in_fs.getsyspath(file_name))
 
-    return preview_files(files, out_fs, num_threads, multithreading)
+    return preview_files(files, out_fs, num_threads, multithreading, **kwargs)

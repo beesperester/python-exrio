@@ -72,6 +72,23 @@ class ThrowingArgumentParser(argparse.ArgumentParser):
 
 # methods
 
+def apply_multiprocessing_arguments(parser):
+    # number of threads
+    parser.add_argument('--num_threads', type=int, help='Number of threads to use (Use all available threads by default).')
+
+    # multithreading
+    parser.add_argument('--multithreading', type=int, default=1, help='Use multithreading (default=1).')
+
+def apply_input_output_arguments(parser):
+    # input path argument
+    parser.add_argument('input', default=os.getcwd(), type=str, help='Path to an EXR file or a directory containing EXR files.')
+
+    # output path argument
+    parser.add_argument('output', type=str, help='Path to output directory.')
+
+    # prefix
+    parser.add_argument('--prefix', type=str, help='Prefix output files.')
+
 def handle_arguments():
     """ Commandline arguments entrypoint. """
 
@@ -110,35 +127,19 @@ def handle_arguments():
     except ArgumentParserError as error:
         pass
 
-    # input path argument
-    rechannel_parser.add_argument('input', default=os.getcwd(), type=str, help='Path to an EXR file or a directory containing EXR files.')
-
-    # output path argument
-    rechannel_parser.add_argument('output', type=str, help='Path to output directory.')
+    apply_input_output_arguments(rechannel_parser)
 
     # layer map argument
     rechannel_parser.add_argument('map', type=str, help='Path to a JSON file containing the layers to rename. Use regular expression to find the name and replace it with a new name. Example: {}'.format(json.dumps(layer_map)))
 
-    # number of threads
-    rechannel_parser.add_argument('--num_threads', type=int, help='Number of threads to use (Use all available threads by default).')
-
-    # multithreading
-    rechannel_parser.add_argument('--multithreading', type=int, default=1, help='Use multithreading (default=1).')
+    apply_multiprocessing_arguments(rechannel_parser)
 
     # create preview subparser
     preview_parser = subparsers.add_parser('preview', help='Create previews for EXR files and directories containing EXR files.')
 
-    # input path argument
-    preview_parser.add_argument('input', type=str, help='Path to an EXR file or a directory containing EXR files.')
+    apply_input_output_arguments(preview_parser)
 
-    # output path argument
-    preview_parser.add_argument('output', type=str, help='Path to output directory.')
-
-    # number of threads
-    preview_parser.add_argument('--num_threads', type=int, help='Number of threads to use (Use all available threads by default).')
-
-    # multithreading
-    preview_parser.add_argument('--multithreading', type=int, default=1, help='Use multithreading (default=1).')
+    apply_multiprocessing_arguments(preview_parser)
 
     # create inspect subparser
     inspect_parser = subparsers.add_parser('inspect', help='Inspect EXR files or a directory containing EXR files.')
@@ -175,6 +176,7 @@ def handle_rechannel(**kwargs):
     default_args = {
         'input': None,
         'output': None,
+        'prefix': None,
         'map': None,
         'num_threads': None,
         'multithreading': 1
@@ -217,9 +219,13 @@ def handle_rechannel(**kwargs):
         in_fs = OSFS(dirname)
 
         if in_fs.isfile(basename):
+            # prepend prefix to basename
+            if args.prefix:
+                basename = args.prefix + basename
+
             rechannel_file(in_fs.getsyspath(basename), out_fs.getsyspath(basename), layer_map)
         elif in_fs.isdir(basename):
-            rechannel_dir(in_fs.opendir(basename), out_fs, layer_map, args.num_threads, bool(args.multithreading))
+            rechannel_dir(in_fs.opendir(basename), out_fs, layer_map, args.num_threads, bool(args.multithreading), prefix=args.prefix)
     except CreateFailed:
         console.error('Input {} does not exist.'.format(args.input))
 
@@ -234,6 +240,7 @@ def handle_preview(**kwargs):
     default_args = {
         'input': None,
         'output': None,
+        'prefix': None,
         'num_threads': None,
         'multithreading': 1
     }
@@ -255,11 +262,15 @@ def handle_preview(**kwargs):
         if in_fs.isfile(basename):
             filename, extension = os.path.splitext(basename)
 
+            # prepend prefix to filename
+            if args.prefix:
+                filename = args.prefix + filename
+
             out_name = unicode(filename + '.jpg')
 
             preview_file(in_fs.getsyspath(basename), out_fs.getsyspath(out_name))
         elif in_fs.isdir(basename):
-            preview_dir(in_fs.opendir(basename), out_fs, args.num_threads, bool(args.multithreading))
+            preview_dir(in_fs.opendir(basename), out_fs, args.num_threads, bool(args.multithreading), prefix=args.prefix)
     except CreateFailed:
         console.error('Input {} does not exist.'.format(args.input))
 

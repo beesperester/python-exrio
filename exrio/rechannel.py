@@ -95,7 +95,7 @@ def rechannel_file(in_path, out_path, layer_map=None):
 
     console.info('Finished rechannel of of {out_path} ({duration}s).'.format(out_path=os.path.basename(out_path), duration=duration)) 
 
-def rechannel_files(files, out_fs, layer_map=None, num_threads=None, multiprocessing=True):
+def rechannel_files(files, out_fs, layer_map=None, num_threads=None, multiprocessing=True, **kwargs):
     """ Rechannel list of exr files and use multiprocessing.
 
     Args:
@@ -115,6 +115,10 @@ def rechannel_files(files, out_fs, layer_map=None, num_threads=None, multiproces
     for file_path in files:
         dirname, basename = os.path.split(file_path)
 
+        # prepend prefix to basename
+        if 'prefix' in kwargs and kwargs['prefix']:
+            basename = kwargs['prefix'] + basename
+
         # get out_path
         out_path = out_fs.getsyspath(unicode(basename))
 
@@ -124,7 +128,7 @@ def rechannel_files(files, out_fs, layer_map=None, num_threads=None, multiproces
 
     console.info('Finished rechannel of {} files.'.format(len(files)))
 
-def rechannel_dir(in_fs, out_fs, layer_map=None, num_threads=None, multithreading=True):
+def rechannel_dir(in_fs, out_fs, layer_map=None, num_threads=None, multithreading=True, **kwargs):
     """ Rechannel exr files in in_fs.
 
     Args:
@@ -140,4 +144,4 @@ def rechannel_dir(in_fs, out_fs, layer_map=None, num_threads=None, multithreadin
     for file_name in in_fs.walk.files(filter=['*.exr']):
         files.append(in_fs.getsyspath(file_name))
 
-    return rechannel_files(files, out_fs, layer_map, num_threads, multithreading)
+    return rechannel_files(files, out_fs, layer_map, num_threads, multithreading, **kwargs)
