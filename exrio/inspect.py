@@ -12,6 +12,7 @@ from exrio.exrio_exceptions import NoExrFileException, SameFileException
 
 # helpers
 from exrio.helpers.json_helpers import is_jsonable, filter_jsonable
+from exrio.helpers.multiprocessing_helpers import run
 
 def inspect_file(in_path):
     """ TODO: add docstring.
@@ -71,11 +72,9 @@ def inspect_files(files):
     tasks = []
 
     for file_path in files:
-        tasks.append((file_path))
+        tasks.append((inspect_file, file_path))
 
-    # run tasks in order
-    for task in tasks:
-        inspect_file(*task)
+    run(tasks, None, False)
 
     print 'Finished inspect of {} files.'.format(len(files))
 

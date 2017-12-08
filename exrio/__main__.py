@@ -141,6 +141,9 @@ def handle_arguments():
 
     apply_multiprocessing_arguments(preview_parser)
 
+    # layer
+    preview_parser.add_argument('--layer', type=str, nargs='+', help='Select layer to preview (default=rgb).')
+
     # create inspect subparser
     inspect_parser = subparsers.add_parser('inspect', help='Inspect EXR files or a directory containing EXR files.')
 
@@ -241,6 +244,7 @@ def handle_preview(**kwargs):
         'input': None,
         'output': None,
         'prefix': None,
+        'layer': None,
         'num_threads': None,
         'multithreading': 1
     }
@@ -251,6 +255,9 @@ def handle_preview(**kwargs):
 
     # open output filesystem
     out_fs = assure_fs(args.output)
+
+    # join layer
+    layer = ' '.join(args.layer)
 
     # split input path
     dirname, basename = os.path.split(unicode(args.input))
@@ -268,9 +275,9 @@ def handle_preview(**kwargs):
 
             out_name = unicode(filename + '.jpg')
 
-            preview_file(in_fs.getsyspath(basename), out_fs.getsyspath(out_name))
+            preview_file(in_fs.getsyspath(basename), out_fs.getsyspath(out_name), layer)
         elif in_fs.isdir(basename):
-            preview_dir(in_fs.opendir(basename), out_fs, args.num_threads, bool(args.multithreading), prefix=args.prefix)
+            preview_dir(in_fs.opendir(basename), out_fs, args.num_threads, bool(args.multithreading), prefix=args.prefix, layer=layer)
     except CreateFailed:
         console.error('Input {} does not exist.'.format(args.input))
 

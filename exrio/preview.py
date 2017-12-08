@@ -2,6 +2,7 @@
 
 # system
 import os
+import re
 import time
 
 # image manipulation
@@ -14,11 +15,12 @@ from exrio.exrio_exceptions import NoExrFileException, SameFileException
 
 # helpers
 from exrio.helpers.multiprocessing_helpers import run
+from exrio.helpers.list_helpers import sort_rgba
 
 # exrio
 from exrio import console
 
-def preview_file(in_path, out_path):
+def preview_file(in_path, out_path, layer=None):
     """ Create preview of exr files by normalizing the color range to 8bit.
 
     Args:
@@ -49,7 +51,28 @@ def preview_file(in_path, out_path):
     data_window = in_exr_header['dataWindow']
     size = (data_window.max.x - data_window.min.x + 1, data_window.max.y - data_window.min.y + 1)
 
-    rgbf = [Image.fromstring("F", size, in_exr_file.channel(c, pixel_type)) for c in "RGB"]
+    # default channels
+    channels = 'RGB'
+
+    if layer:
+        selected_channels = []
+
+        for layer_name, value in in_exr_header['channels'].iteritems():
+            if re.search(r'{}'.format(layer), layer_name, flags=re.IGNORECASE):
+                if not layer_name in selected_channels:
+                    selected_channels.append(layer_name)
+
+        selected_channels = sort_rgba(selected_channels)
+
+        if selected_channels:
+            if len(selected_channels) < 3:
+                channels = [selected_channels[0], selected_channels[0], selected_channels[0]]
+            else:
+                channels = selected_channels
+
+        console.debug(channels)
+
+    rgbf = [Image.fromstring("F", size, in_exr_file.channel(c, pixel_type)) for c in channels]
 
     extrema = [im.getextrema() for im in rgbf]
     darkest = min([lo for (lo,hi) in extrema])
@@ -106,7 +129,13 @@ def preview_files(files, out_fs, num_threads=None, multiprocessing=True, **kwarg
         # get out_path
         out_path = out_fs.getsyspath(out_name)
 
-        tasks.append((preview_file, file_path, out_path))
+        layer = None
+
+        # get layer from kwargs
+        if 'layer' in kwargs:
+            layer = kwargs['layer']
+
+        tasks.append((preview_file, file_path, out_path, layer))
 
     run(tasks, num_threads, multiprocessing)
 
