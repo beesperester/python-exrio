@@ -3,7 +3,6 @@
 # system
 import argparse
 import json
-import logging
 import os
 import sys
 
@@ -17,6 +16,7 @@ from fs.errors import CreateFailed
 from exrio.rechannel import rechannel_dir, rechannel_file
 from exrio.preview import preview_dir, preview_file
 from exrio.inspect import inspect_dir, inspect_file
+from exrio import console
 
 # helpers
 from exrio.helpers.dict_helpers import dict_to_namedtuple
@@ -149,9 +149,13 @@ def handle_arguments():
     try:
         args = parser.parse_args()
     except ArgumentParserError as error:
-        print error
+        console.error(error.message)
 
         parser.print_help()
+
+        return
+    except Exception as error:
+        console.error(error.message)
 
         return
 
@@ -193,11 +197,15 @@ def handle_rechannel(**kwargs):
                 try:
                     layer_map = json.loads(file_handle.read())
                 except Exception as error:
-                    logging.error(error)
+                    console.error(error)
 
                     return
+        else:
+            console.error('Map {} does not exist.'.format(args.map))
+
+            return
     except CreateFailed:
-        print 'Map {} does not exist.'.format(args.output)
+        console.error('Map parent directory {} does not exist.'.format(args.map))
 
         return
 
@@ -213,7 +221,7 @@ def handle_rechannel(**kwargs):
         elif in_fs.isdir(basename):
             rechannel_dir(in_fs.opendir(basename), out_fs, layer_map, args.num_threads, bool(args.multithreading))
     except CreateFailed:
-        print 'Input {} does not exist.'.format(args.input)
+        console.error('Input {} does not exist.'.format(args.input))
 
         return
 
@@ -253,7 +261,7 @@ def handle_preview(**kwargs):
         elif in_fs.isdir(basename):
             preview_dir(in_fs.opendir(basename), out_fs, args.num_threads, bool(args.multithreading))
     except CreateFailed:
-        print 'Input {} does not exist.'.format(args.input)
+        console.error('Input {} does not exist.'.format(args.input))
 
         return
 
@@ -283,13 +291,11 @@ def handle_inspect(**kwargs):
         elif in_fs.isdir(basename):
             inspect_dir(in_fs.opendir(basename))
     except CreateFailed:
-        print 'Input {} does not exist.'.format(args.input)
+        console.error('Input {} does not exist.'.format(args.input))
 
         return
 
 if __name__ == '__main__':
     freeze_support()
-
-    logging.basicConfig(level=logging.DEBUG)
 
     handle_arguments()

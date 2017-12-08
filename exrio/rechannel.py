@@ -14,6 +14,9 @@ from exrio.exrio_exceptions import NoExrFileException, SameFileException
 # helpers
 from exrio.helpers.multiprocessing_helpers import run
 
+# exrio
+from exrio import console
+
 # methods
 
 def rechannel_file(in_path, out_path, layer_map=None):
@@ -27,7 +30,7 @@ def rechannel_file(in_path, out_path, layer_map=None):
     Raises:
         NoExrFileException
     """
-    print 'Start rechannel of {out_path}.'.format(out_path=out_path)
+    console.info('Started rechannel of {in_path}.'.format(in_path=os.path.basename(in_path)))
 
     if in_path == out_path:
         raise SameFileException(out_path)
@@ -90,7 +93,7 @@ def rechannel_file(in_path, out_path, layer_map=None):
     # duration
     duration = round(time_stop - time_start)
 
-    print 'Rechanneld {num_channels} channels of {out_path} ({duration}s).'.format(num_channels=len(matched_layers.keys()), out_path=out_path, duration=duration)
+    console.info('Finished rechannel of of {out_path} ({duration}s).'.format(out_path=os.path.basename(out_path), duration=duration)) 
 
 def rechannel_files(files, out_fs, layer_map=None, num_threads=None, multiprocessing=True):
     """ Rechannel list of exr files and use multiprocessing.
@@ -105,7 +108,7 @@ def rechannel_files(files, out_fs, layer_map=None, num_threads=None, multiproces
     Raises:
         SameFileException
     """
-    print 'Started renaming of {} files.'.format(len(files))
+    console.info('Started rechannel of {} files.'.format(len(files)))
 
     tasks = []
 
@@ -119,7 +122,7 @@ def rechannel_files(files, out_fs, layer_map=None, num_threads=None, multiproces
 
     run(tasks, num_threads, multiprocessing)
 
-    print 'Finished renaming of {} files.'.format(len(files))
+    console.info('Finished rechannel of {} files.'.format(len(files)))
 
 def rechannel_dir(in_fs, out_fs, layer_map=None, num_threads=None, multithreading=True):
     """ Rechannel exr files in in_fs.

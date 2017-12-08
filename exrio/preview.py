@@ -15,6 +15,9 @@ from exrio.exrio_exceptions import NoExrFileException, SameFileException
 # helpers
 from exrio.helpers.multiprocessing_helpers import run
 
+# exrio
+from exrio import console
+
 def preview_file(in_path, out_path):
     """ Create preview of exr files by normalizing the color range to 8bit.
 
@@ -25,7 +28,7 @@ def preview_file(in_path, out_path):
     Raises:
         NoExrFileException
     """
-    print 'Started preview of {out_path}.'.format(out_path=out_path)
+    console.info('Started preview of {in_path}.'.format(in_path=os.path.basename(in_path)))
 
     if in_path == out_path:
         raise SameFileException(out_path)
@@ -71,7 +74,7 @@ def preview_file(in_path, out_path):
     # duration
     duration = round(time_stop - time_start)
 
-    print 'Finished preview for {out_path} ({duration}s).'.format(out_path=out_path, duration=duration)
+    console.info('Finished preview for {out_path} ({duration}s).'.format(out_path=os.path.basename(out_path), duration=duration))
 
 def preview_files(files, out_fs, num_threads=None, multiprocessing=True):
     """ Create previews for a list of files and use multiprocessing.
@@ -85,7 +88,7 @@ def preview_files(files, out_fs, num_threads=None, multiprocessing=True):
     Raises:
         SameFileException
     """
-    print 'Started preview of {} files.'.format(len(files))
+    console.info('Started preview of {} files.'.format(len(files)))
 
     tasks = []
 
@@ -103,7 +106,7 @@ def preview_files(files, out_fs, num_threads=None, multiprocessing=True):
 
     run(tasks, num_threads, multiprocessing)
 
-    print 'Finished preview of {} files.'.format(len(files))
+    console.info('Finished preview of {} files.'.format(len(files)))
 
 def preview_dir(in_fs, out_fs, num_threads=None, multithreading=True):
     """ Create list of exr files in directory and create previews.
