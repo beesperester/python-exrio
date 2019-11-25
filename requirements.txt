@@ -23,7 +23,7 @@ pockets==0.5.1
 Pygments==2.2.0
 pylint==1.7.4
 pytz==2017.3
-requests==2.18.4
+requests==2.20.0
 singledispatch==3.4.0.3
 six==1.11.0
 snowballstemmer==1.2.1
